@@ -427,53 +427,57 @@ window.addEventListener('load', function(){
    [250,65,-300],[0,100,-400],[-150,75,-500],[350,85,-400]].forEach(p=>scene.add(cloud(...p)));
 
   // Logo Optimen en el ala
-// Logo Optimen en el ala
-function makeLogoTexture(){
-  const c = document.createElement('canvas');
-  c.width = 320; c.height = 128;
-  const ctx = c.getContext('2d');
-
-  // Fondo azul
-  ctx.fillStyle = '#1155cc';
-  ctx.fillRect(0,0,320,128);
-
-  // Texto OPTIMEN
-  ctx.fillStyle = '#ffffff';
-  ctx.font = 'bold 26px Arial Black, Arial';
-  ctx.textAlign = 'left';
-  ctx.textBaseline = 'middle';
-  ctx.fillText('OPTIMEN', 8, 64);
-
-  // Huella digital circular
-  const cx = 250, cy = 64, R = 48;
-  ctx.strokeStyle = '#ffffff';
-  ctx.lineCap = 'round';
-
-  for(let i=0;i<11;i++){
-    const r = 8 + i*4;
-    const lineW = 2.2 - i*0.05;
-    ctx.lineWidth = Math.max(1.2, lineW);
-
-    const numSegments = 3 + i;
-    const gapAngle = 0.18 + i*0.015;
-    const totalAngle = Math.PI*2;
-    const segAngle = (totalAngle - numSegments*gapAngle) / numSegments;
-
-    const baseRot = i * 0.22 - Math.PI*0.5;
-
-    for(let s=0;s<numSegments;s++){
-      const startA = baseRot + s*(segAngle+gapAngle);
-      const endA   = startA + segAngle;
-
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, startA, endA);
-      ctx.stroke();
+  function makeLogoTexture(){
+    const c = document.createElement('canvas');
+    c.width = 320; c.height = 128;
+    const ctx = c.getContext('2d');
+    // Fondo azul
+    ctx.fillStyle = '#1155cc';
+    ctx.fillRect(0,0,320,128);
+    // Texto OPTIMEN
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 26px Arial Black, Arial';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('OPTIMEN', 2, 64);
+    // Huella digital circular
+    const cx = 250, cy = 64, R = 48;
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineCap = 'round';
+    // Dibujamos arcos concentricos con gaps para simular huella digital
+    for(let i=0;i<11;i++){
+      const r = 8 + i*4;
+      const lineW = 2.2 - i*0.05;
+      ctx.lineWidth = Math.max(1.2, lineW);
+      // Cada anillo tiene varios segmentos de arco con gaps
+      const numSegments = 3 + i;
+      const gapAngle = 0.18 + i*0.015;
+      const totalAngle = Math.PI*2;
+      const segAngle = (totalAngle - numSegments*gapAngle) / numSegments;
+      // Rotacion base varia por anillo para dar efecto de huella
+      const baseRot = i * 0.22 - Math.PI*0.5;
+      
     }
+    // Clip circular para que quede redondo
+    return new THREE.CanvasTexture(c);
   }
+  const logoTex = makeLogoTexture();
 
-  return new THREE.CanvasTexture(c);
-}
-const logoTex = makeLogoTexture();
+  // Textura espejada para ala derecha (OPTIMEN pegado a la derecha)
+  function makeLogoTextureR(){
+    const c = document.createElement('canvas');
+    c.width = 320; c.height = 128;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = '#1155cc';
+    ctx.fillRect(0,0,320,128);
+    ctx.fillStyle = '#ffffff';
+    ctx.font = 'bold 26px Arial Black, Arial';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('OPTIMEN', 318, 64);
+    return new THREE.CanvasTexture(c);
+  }
+  const logoTexR = makeLogoTextureR();
 
   // Avion
   const plane = new THREE.Group();
@@ -482,7 +486,7 @@ const logoTex = makeLogoTexture();
   const darkMat  = new THREE.MeshPhongMaterial({color:0x333333});
   const blackMat = new THREE.MeshPhongMaterial({color:0x111111});
   const logoMatL = new THREE.MeshPhongMaterial({map:logoTex});
-  const logoMatR = new THREE.MeshPhongMaterial({map:logoTex});
+  const logoMatR = new THREE.MeshPhongMaterial({map:logoTexR});
 
   // Fuselaje
   const body = new THREE.Mesh(new THREE.CylinderGeometry(0.38,0.22,5.5,10), whiteMat);
@@ -491,11 +495,11 @@ const logoTex = makeLogoTexture();
   // Alas con logo arriba
   const wingL = new THREE.Mesh(new THREE.BoxGeometry(7,0.12,1.8),
     [blueMat,blueMat,logoMatL,blueMat,blueMat,blueMat]);
-  wingL.position.set(-4.2,0.1,0); plane.add(wingL);
+  wingL.position.set(-3.5,0.1,0); plane.add(wingL);
 
   const wingR = new THREE.Mesh(new THREE.BoxGeometry(7,0.12,1.8),
     [blueMat,blueMat,logoMatR,blueMat,blueMat,blueMat]);
-  wingR.position.set(4.2,0.1,0); plane.add(wingR);
+  wingR.position.set(3.5,0.1,0); plane.add(wingR);
 
   // Cola horizontal
   const tailH = new THREE.Mesh(new THREE.BoxGeometry(4.5,0.1,0.9), blueMat);
@@ -921,21 +925,3 @@ function animate(){
  - Más vegetación
  - Montañas más prominentes
 */
-const rawTrees = [
-  ...todos los árboles que ya tienes...
-
-  [-400,-750],[-380,-780],[400,-750],[380,-780],
-
-  // Bosque extra
-  [-700,-300],[-720,-320],[-680,-340],[-740,-280],[-660,-310],
-  [700,-300],[720,-320],[680,-340],[740,-280],[660,-310],
-
-  [-800,-600],[-820,-620],[-780,-640],[-840,-580],[-760,-610],
-  [800,-600],[820,-620],[780,-640],[840,-580],[760,-610],
-
-  [-300,-900],[-320,-920],[-280,-940],[-340,-880],[-260,-910],
-  [300,-900],[320,-920],[280,-940],[340,-880],[260,-910],
-
-  [-900,-1000],[-920,-1020],[-880,-1040],
-  [900,-1000],[920,-1020],[880,-1040]
-];
